@@ -8,8 +8,13 @@ using namespace std;
 class FiveCardDraw: public Game {
 
 protected:
+	size_t dealer;
+	Deck trash;
+	FiveCardDraw();
 
 public:
+	virtual int before_turn(Player & p); 
+
 
 private:
 
