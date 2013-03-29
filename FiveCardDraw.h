@@ -13,10 +13,12 @@ protected:
 	FiveCardDraw();
 
 public:
-	virtual int before_turn(Player & p); 
-
-
-private:
+	virtual int before_turn(Player & p);
+	virtual int turn(Player & p);
+	virtual int after_turn(Player & p);
+	virtual int before_round();
+	virtual int round();
+	virtual int after_round();
 
 };
 
