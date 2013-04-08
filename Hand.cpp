@@ -102,7 +102,7 @@ bool Hand::operator==(const Hand &otherHand) const
 
 const Card & Hand::operator[] (size_t position){
 	if ((position > _cards.size()) || (position < 0)){
-		throw "Invalid_Index"; 
+		throw Invalid_Index; 
 	}
 	else{
 		return _cards[position];
@@ -116,7 +116,7 @@ void Hand::insert(Card card){
 
 void Hand::remove_card (size_t position){
 	if ((position > _cards.size()) || (position < 0)){
-		throw "Invalid_Index"; 
+		throw Invalid_Index; 
 	}
 	else{
 		_cards.erase(_cards.begin()+ position);

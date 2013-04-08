@@ -5,6 +5,7 @@
 #include <iostream>
 #include <vector>
 #include "Card.h"
+#include "Utility.h"
 using namespace std;
 
 #ifndef HAND_H

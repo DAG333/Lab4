@@ -1,17 +1,10 @@
 #include "stdafx.h"
-#include "Card.h"
-#include "Hand.h"
-#include <string>
-#include <iostream>
+#include "Poker.h"
 
 using namespace std;
 
-const static int HAND_SIZE = 5;
 
-enum HAND_TIER {nullTier = 0, high_card = 1, pairr = 2, two_pair = 3, three_of_a_kind = 4,
-		straight = 5, flushh = 6, full_house = 7, four_of_a_kind = 8, straight_flush = 9};
-
-Card::_RANK irank_to_erank(int n)
+Card::_RANK Poker::irank_to_erank(int n)
 {
 	 switch( n )
 	 {
@@ -33,7 +26,25 @@ Card::_RANK irank_to_erank(int n)
 	}
 }
 
-void assessHandValue(Hand h, HAND_TIER & tier, vector<Card::_RANK> & tieBreakers)
+string Poker::tier_to_string(HAND_TIER tier)
+{
+	 switch( tier )
+	 {
+		case nullTier :  return "null";
+		case high_card : return "high card";
+		case pairr : return "pair";
+		case two_pair : return "two pair";
+		case three_of_a_kind : return "three of a kind";
+		case straight : return "straight";
+		case flushh : return "flush";
+		case full_house : return "full house";
+		case four_of_a_kind : return "four of a kind";
+		case straight_flush : return "straight flush";
+		default: throw;
+	}
+}
+
+void Poker::assessHandValue(Hand h, HAND_TIER & tier, vector<Card::_RANK> & tieBreakers)
 {
 	int ranks[Card::NUM_RANKS];
 	int suits[Card::NUM_SUITS];
@@ -71,15 +82,15 @@ void assessHandValue(Hand h, HAND_TIER & tier, vector<Card::_RANK> & tieBreakers
 		}
 	}
 	if(straightCounter == (int)h.get_cards().size()){
-		cout << "found a straight!" << endl;
+		//cout << "found a straight!" << endl;
 		string rankString = Card::convertErank(straightHighRank);
-		cout << "straight highest rank = " << rankString << endl;
+		//cout << "straight highest rank = " << rankString << endl;
 		straightb = true;
 	}
 	if(flushCounter == (int)h.get_cards().size()){
-		cout << "found a flush!" << endl;
+		//cout << "found a flush!" << endl;
 		string suitString = Card::convertEsuit(flushType);
-		cout << "flush suit = " << suitString << endl;
+		//cout << "flush suit = " << suitString << endl;
 		flushb = true;
 	}
 
@@ -194,7 +205,7 @@ void assessHandValue(Hand h, HAND_TIER & tier, vector<Card::_RANK> & tieBreakers
 	}
 }
 
-bool poker_rank(const Hand & hand1, const Hand & hand2)
+bool Poker::poker_rank(const Hand & hand1, const Hand & hand2)
 {
 	HAND_TIER tier1 = nullTier;
 	HAND_TIER tier2 = nullTier;
@@ -223,4 +234,79 @@ bool poker_rank(const Hand & hand1, const Hand & hand2)
 		//the hands are equal
 		return false;
 	}
+}
+
+
+bool Poker::poker_rank_players(const Player * p1, const Player * p2){
+	if( p1 == 0 || p2 == 0){
+		throw Null_Player; 
+	}
+	else{
+		return poker_rank(p1->_hand, p2->_hand);
+	}
+}
+
+
+bool Poker::is_tied_players(const Player * p1, const Player * p2)
+{
+
+	if( p1 == 0 || p2 == 0){
+		throw Null_Player;
+	}
+	else{
+			
+		HAND_TIER tier1 = nullTier;
+		HAND_TIER tier2 = nullTier;
+		vector<Card::_RANK> tieBreakers1(HAND_SIZE);
+		vector<Card::_RANK> tieBreakers2(HAND_SIZE);
+		for(int i = 0; i < HAND_SIZE; i++){
+			tieBreakers1[i] = Card::nullRank;
+			tieBreakers2[i] = Card::nullRank;
+		}
+		assessHandValue(p1->_hand, tier1, tieBreakers1);
+		assessHandValue(p2->_hand, tier2, tieBreakers2);
+
+		if(tier1 < tier2){
+			return false;
+		}
+		else if(tier1 > tier2){
+			return false;
+		}
+		else{
+			for(int i = 0; i < (int)tieBreakers1.size(); i++){
+				if(tieBreakers1[i] < tieBreakers2[i])
+					return false;
+				else if(tieBreakers1[i] > tieBreakers2[i])
+					return false;
+			}
+			//the hands are equal
+			return true;
+		}
+	}
+}
+
+Poker::HAND_TIER Poker::get_tier(Hand hand)
+{
+	
+	HAND_TIER tier = Poker::nullTier;
+	vector<Card::_RANK> tieBreakers;
+	for(int i = 0; i < HAND_SIZE; i++){
+		tieBreakers.push_back(Card::nullRank);
+	}
+	
+	assessHandValue(hand, tier, tieBreakers);
+	
+	return tier;
+}
+
+vector<Card::_RANK> Poker::get_tiebreakers(Hand hand)
+{
+	
+	HAND_TIER tier = Poker::nullTier;
+	vector<Card::_RANK> tieBreakers;
+	for(int i = 0; i < HAND_SIZE; i++){
+		tieBreakers.push_back(Card::nullRank);
+	}
+	assessHandValue(hand, tier, tieBreakers);
+	return tieBreakers;
 }
